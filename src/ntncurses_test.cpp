@@ -36,7 +36,9 @@ int main() {
 		for (int i = 0; i < 20; ++i) {
 			ntncurses.setColorRgb(255, 255, 0, 50, 50, 100);
 			ntncurses.setAttrOn(COLOR_PAIR(nt::CUSTOM));
-			ntncurses.mvaddCh(i, i, ' ' | A_REVERSE);
+			//ntncurses.mvaddCh(i, i, ' ' | A_REVERSE);
+			//ntncurses.mvaddCh(i, i, ' ' | ACS_CKBOARD);
+			ntncurses.mvaddCh(i, i, ' ' | A_BOLD | A_REVERSE | ACS_BULLET);
 			ntncurses.setAttrOff(COLOR_PAIR(nt::CUSTOM));
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
@@ -49,7 +51,8 @@ int main() {
 	worker5.join();
     
 	ntncurses.print("Press any key to exit...");
-	ntncurses.getKey();
+	int ch;
+	while((ch = ntncurses.getKey()) != ' ') ntncurses.addCh(ch);
     
     return 0;
 }

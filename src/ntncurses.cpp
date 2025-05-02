@@ -151,51 +151,100 @@ bool NTNCurses::setColorRgb(short r_text, short g_text, short b_text,
 	return true;
 }
 
-void NTNCurses::setAttrOn(int attrs) {
-	enqueue([attrs]() {
-		attron(attrs);
-		refresh();
-	});
+//
+int NTNCurses::setAttrOn(int attrs) {
+	try {
+		enqueue([attrs]() {
+			int result = attron(attrs);
+			if (result == ERR) {
+				throw std::runtime_error("setAttrOn failed");
+			}
+			refresh();
+		});
+			return OK;
+		} catch (...) {
+			return ERR;
+	}
 }
 
-void NTNCurses::setAttrOff(int attrs) {
-	enqueue([attrs]() {
-		attroff(attrs);
-		refresh();
-	});
+//
+int NTNCurses::setAttrOff(int attrs) {
+	try {
+		enqueue([attrs]() {
+			int result = attroff(attrs);
+			if (result == ERR) {
+				throw std::runtime_error("setAttrOff failed");
+			}
+			refresh();
+		});
+			return OK;
+		} catch (...) {
+			return ERR;
+	}
 }
 
 // Базовая версия addch
-void NTNCurses::addCh(chtype ch) {
-	enqueue([ch]() {
-		addch(ch);
-		refresh();
-	});
+int NTNCurses::addCh(chtype ch) {
+	try {
+		enqueue([ch]() {
+			int result = addch(ch);
+			if (result == ERR) {
+				throw std::runtime_error("addCh failed");
+			}
+			refresh();
+		});
+			return OK;
+		} catch (...) {
+			return ERR;
+	}
 }
 
 // Версия addch для окон (window)
-void NTNCurses::waddCh(WINDOW* win, chtype ch) {
-	enqueue([win, ch]() {
-		waddch(win, ch);
-		wrefresh(win);
-	});
+int NTNCurses::waddCh(WINDOW* win, chtype ch) {
+	try {
+		enqueue([win, ch]() {
+			int result = waddch(win, ch);
+			if (result == ERR) {
+				throw std::runtime_error("waddch failed");
+			}
+			wrefresh(win);
+		});
+			return OK;
+		} catch (...) {
+			return ERR;
+	}
 }
 
 // Версия addch с перемещением курсора
 int NTNCurses::mvaddCh(int y, int x, chtype ch) {
-	enqueue([y, x, ch]() {
-		mvaddch(y, x, ch);
-		refresh();
-	});
-	return OK;
+	try {
+		enqueue([y, x, ch]() {
+			int result = mvaddch(y, x, ch);
+			if (result == ERR) {
+				throw std::runtime_error("mvaddch failed");
+			}
+			refresh();
+		});
+		return OK;
+	} catch (...) {
+		return ERR;
+	}
 }
 
 // Комбинированная версия addch (окно + перемещение)
-void NTNCurses::mvwaddCh(WINDOW* win, int y, int x, chtype ch) {
-	enqueue([win, y, x, ch]() {
-		mvwaddch(win, y, x, ch);
-		wrefresh(win);
-	});
+int NTNCurses::mvwaddCh(WINDOW* win, int y, int x, chtype ch) {
+	try {
+		enqueue([win, y, x, ch]() {
+			int result = mvwaddch(win, y, x, ch);
+			if (result == ERR) {
+				throw std::runtime_error("mvaddch failed");
+			}
+			wrefresh(win);
+		});
+		return OK;
+	} catch (...) {
+		return ERR;
+	}
 }
 
 //
@@ -206,6 +255,7 @@ void NTNCurses::print(const std::string& msg) {
 	});
 }
 
+//
 int NTNCurses::getKey() {
 	int ch = 0;
 	std::mutex m;
@@ -213,7 +263,7 @@ int NTNCurses::getKey() {
 	bool done = false;
         
 	enqueue([&]() {
-		ch = ::getch();
+		ch = getch();
 		{
 			std::lock_guard<std::mutex> lock(m);
 			done = true;

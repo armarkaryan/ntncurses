@@ -6,6 +6,7 @@
 #include <queue>
 #include <thread>
 #include <condition_variable>
+#include <stdexcept>
 
 #include "nttypes.h"
 
@@ -62,22 +63,24 @@ public:
 	bool setColorRgb(short r_text, short g_text, short b_text,
 					short r_bg, short g_bg, short b_bg);
 
-	void setAttrOn(int attrs);
+	//
+	int setAttrOn(int attrs);
 
-	void setAttrOff(int attrs);
+	//
+	int setAttrOff(int attrs);
 
 	// Вывод символов
 	// Базовая версия addch
-	void addCh(chtype ch);
+	int addCh(chtype ch);
 
 	// Версия addch для окон (window)
-	void waddCh(WINDOW* win, chtype ch);
+	int waddCh(WINDOW* win, chtype ch);
 
 	// Версия addch с перемещением курсора
 	int mvaddCh(int y, int x, chtype ch);
 
 	// Комбинированная версия addch (окно + перемещение)
-	void mvwaddCh(WINDOW* win, int y, int x, chtype ch);
+	int mvwaddCh(WINDOW* win, int y, int x, chtype ch);
 
 
 	// Работа со строками
