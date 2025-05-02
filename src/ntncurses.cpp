@@ -138,9 +138,6 @@ void NTNCurses::setColor(short color, short bg_color) {
 bool NTNCurses::setColorRgb(short r_text, short g_text, short b_text,
 					 short r_bg, short g_bg, short b_bg) {
 	if (!_supports_rgb) return false;
-	//std::mutex _mtx;
-	//{
-	//std::lock_guard<std::mutex> lock(_mtx);
 	short color = 100;
 	short colorBg = 101;
 	enqueue([color, r_text, g_text, b_text, colorBg, r_bg, g_bg, b_bg]() {
@@ -151,7 +148,6 @@ bool NTNCurses::setColorRgb(short r_text, short g_text, short b_text,
 		init_pair(nt::CUSTOM, color, colorBg);
 		refresh();
 	});
-	//}
 	return true;
 }
 
@@ -230,33 +226,25 @@ void NTNCurses::print(const std::string& msg) {
 		refresh();
 	});
 }
-/*
-// Установить пользовательские цвета (текст/фон) в стандартной палитре
-void NTNCurses::setCustomColor(short text_color, short bg_color) {
-	enqueue([text_color, bg_color]() {
-		init_pair(9, text_color, bg_color);
-		refresh();
+
+int NTNCurses::getKey() {
+	int ch = 0;
+	std::mutex m;
+	std::condition_variable cv;
+	bool done = false;
+        
+	enqueue([&]() {
+		ch = ::getch();
+		{
+			std::lock_guard<std::mutex> lock(m);
+			done = true;
+		}
+		cv.notify_one();
 	});
+        
+	std::unique_lock<std::mutex> lock(m);
+	cv.wait(lock, [&]() { return done; });
+
+	return ch;
 }
-*/
-    int NTNCurses::getKey() {
-        int ch = 0;
-        std::mutex m;
-        std::condition_variable cv;
-        bool done = false;
-        
-        enqueue([&]() {
-            ch = ::getch();
-            {
-                std::lock_guard<std::mutex> lock(m);
-                done = true;
-            }
-            cv.notify_one();
-        });
-        
-        std::unique_lock<std::mutex> lock(m);
-        cv.wait(lock, [&]() { return done; });
-        
-        return ch;
-    }
 

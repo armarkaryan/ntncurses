@@ -74,7 +74,6 @@ public:
 	void waddCh(WINDOW* win, chtype ch);
 
 	// Версия addch с перемещением курсора
-
 	int mvaddCh(int y, int x, chtype ch);
 /*
 	int mvaddCh(short r_text, short g_text, short b_text,
