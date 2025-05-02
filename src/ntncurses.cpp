@@ -189,28 +189,7 @@ int NTNCurses::mvaddCh(int y, int x, chtype ch) {
 	});
 	return OK;
 }
-/*
-// Версия addch с перемещением курсора
-int NTNCurses::mvaddCh(short r_text, short g_text, short b_text,
-						short r_bg, short g_bg, short b_bg,
-						int y, int x, chtype ch) {
-	if (!_supports_rgb) return ERR;
-	short color = 100;
-	short colorBg = 101;
-	enqueue([color, r_text, g_text, b_text,  colorBg, r_bg, g_bg, b_bg, y, x, ch]() {
-		// Создаем новый цвет в палитре
-		init_color(color, r_text * 1000 / 255, g_text * 1000 / 255, b_text * 1000 / 255);
-		init_color(colorBg, r_bg * 1000 / 255, g_bg * 1000 / 255, b_bg * 1000 / 255);
-		// Связываем цветовую пару
-		init_pair(nt::CUSTOM, color, colorBg);
-		attron(COLOR_PAIR(nt::CUSTOM));
-		mvaddch(y, x, ch);
-		attroff(COLOR_PAIR(nt::CUSTOM));
-		refresh();
-	});
-	return OK;
-}
-*/
+
 // Комбинированная версия addch (окно + перемещение)
 void NTNCurses::mvwaddCh(WINDOW* win, int y, int x, chtype ch) {
 	enqueue([win, y, x, ch]() {

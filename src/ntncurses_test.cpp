@@ -41,17 +41,7 @@ int main() {
 			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
 	});
-	/*
-	std::thread worker5([&]() {
-		for (int i = 0; i < 20; ++i) {
-			//ntncurses.setColorRgb(255, 255, 0, 50, 50, 100);
-			//ntncurses.setAttrOn(COLOR_PAIR(nt::CUSTOM));
-			ntncurses.mvaddCh(255, 255, 0, 50, 50, 100, i, i, ' ' | A_REVERSE);
-			//ntncurses.setAttrOff(COLOR_PAIR(nt::CUSTOM));
-			std::this_thread::sleep_for(std::chrono::milliseconds(1));
-		}
-	});
-*/
+
 	//worker1.join();
 	//worker2.join();
 	worker3.join();

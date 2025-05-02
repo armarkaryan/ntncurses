@@ -75,10 +75,7 @@ public:
 
 	// Версия addch с перемещением курсора
 	int mvaddCh(int y, int x, chtype ch);
-/*
-	int mvaddCh(short r_text, short g_text, short b_text,
-				short r_bg, short g_bg, short b_bg, int y, int x, chtype ch);
-*/
+
 	// Комбинированная версия addch (окно + перемещение)
 	void mvwaddCh(WINDOW* win, int y, int x, chtype ch);
 
