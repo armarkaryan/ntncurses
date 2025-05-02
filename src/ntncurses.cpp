@@ -182,15 +182,6 @@ void NTNCurses::waddCh(WINDOW* win, chtype ch) {
 }
 
 // Версия addch с перемещением курсора
-int NTNCurses::mvaddCh(int y, int x, chtype ch) {
-	enqueue([y, x, ch]() {
-		mvaddch(y, x, ch);
-		refresh();
-	});
-	return OK;
-}
-/*
-// Версия addch с перемещением курсора
 int NTNCurses::mvaddCh(short r_text, short g_text, short b_text,
 						short r_bg, short g_bg, short b_bg,
 						int y, int x, chtype ch) {
@@ -210,7 +201,7 @@ int NTNCurses::mvaddCh(short r_text, short g_text, short b_text,
 	});
 	return OK;
 }
-*/
+
 // Комбинированная версия addch (окно + перемещение)
 void NTNCurses::mvwaddCh(WINDOW* win, int y, int x, chtype ch) {
 	enqueue([win, y, x, ch]() {
