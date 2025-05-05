@@ -18,6 +18,7 @@ int main() {
         }
     });
 */
+
 	std::thread worker3([&]() {
 		for (int i = 0; i < 20; ++i) {
 			ntncurses.addCh('X' | A_BOLD | A_REVERSE);
@@ -49,10 +50,22 @@ int main() {
 	worker3.join();
 	worker4.join();
 	worker5.join();
-    
-	ntncurses.print("Press any key to exit...");
+
+	ntncurses.print("     Press Space to exit...");
+/*
+	for (int i = 0; i < 20; ++i) {
+			ntncurses.setColorRgb(255, 255, 0, 50, 50, 100);
+			ntncurses.setAttrOn(COLOR_PAIR(nt::CUSTOM));
+			//ntncurses.mvaddCh(i, i, ' ' | A_REVERSE);
+			//ntncurses.mvaddCh(i, i, ' ' | ACS_CKBOARD);
+			ntncurses.mvaddCh(i, i, ' ' | A_BOLD | A_REVERSE | ACS_BULLET);
+			ntncurses.setAttrOff(COLOR_PAIR(nt::CUSTOM));
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
+*/
 	int ch;
-	while((ch = ntncurses.getKey()) != ' ') ntncurses.addCh(ch);
-    
+	while((ch = ntncurses.getKey()) != ' ') {
+		ntncurses.addCh(ch);
+	}
     return 0;
 }

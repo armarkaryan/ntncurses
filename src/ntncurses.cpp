@@ -33,7 +33,7 @@ attroff
 resizeterm ?
 */
 #include "ntncurses.h"
-
+#include <iostream>
 // ctor
 NTNCurses::NTNCurses(){
 	// Инициализация ncurses в отдельном потоке
@@ -185,7 +185,7 @@ int NTNCurses::setAttrOff(int attrs) {
 
 // Базовая версия addch
 int NTNCurses::addCh(chtype ch) {
-	try {
+	/*try {
 		enqueue([ch]() {
 			int result = addch(ch);
 			if (result == ERR) {
@@ -196,7 +196,17 @@ int NTNCurses::addCh(chtype ch) {
 			return OK;
 		} catch (...) {
 			return ERR;
-	}
+	}*/
+	enqueue([ch]() {
+		int result = addch(ch);
+		if (result == ERR) {
+			// Лучше логировать ошибку здесь
+			std::cout << "addCh failed" << std::endl;
+			return ERR;
+		}
+		return refresh();
+	});
+	return OK;
 }
 
 // Версия addch для окон (window)
