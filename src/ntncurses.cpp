@@ -24,6 +24,25 @@ void NTNCurses::print(const std::string& msg) {
 */
 
 /*
+	try {
+		enqueue([ch]() {
+			try {
+				if (addch(ch) == ERR || refresh() == ERR) {
+					throw std::runtime_error("addCh or refresh failed");
+				}
+			} catch (...) {
+				// Обработка ошибки в асинхронном коде
+				// Например, логирование или установка флага ошибки
+			}
+		});
+		return OK;
+	} catch (...) {
+		// Это перехватит только ошибки enqueue, но не addch/refresh
+		return ERR;
+	}
+*/
+
+/*
 init_color
 bkgd ?
 init_pair
@@ -44,13 +63,13 @@ NTNCurses::NTNCurses(){
 		keypad(stdscr, TRUE);
 		curs_set(0);
 
-	//timeout(0);
-	start_color();
-	use_default_colors();
+		//timeout(0);
+		start_color();
+		use_default_colors();
 
-	// Проверка поддержки RGB (256 или truecolor)
-	_supports_rgb = (can_change_color() && COLORS >= 256);
-
+		// Проверка поддержки RGB (256 или truecolor)
+		_supports_rgb = (can_change_color() && COLORS >= 256);
+/*
 	// Инициализация стандартных цветов
 	init_pair(1, COLOR_WHITE, COLOR_BLACK);
 	init_pair(2, COLOR_RED, COLOR_BLACK);
@@ -61,11 +80,12 @@ NTNCurses::NTNCurses(){
 	init_pair(7, COLOR_MAGENTA, COLOR_BLACK);
 	init_pair(8, COLOR_WHITE, COLOR_BLACK);
 	init_pair(9, COLOR_WHITE, COLOR_BLACK);
-
+*/
+/*
 	attron(COLOR_PAIR(3));
 	printw("Thread 1: %d\n", 34);
 	attroff(COLOR_PAIR(3));
-
+*/
 		while (true) {
 			std::function<void()> task;
 			{
@@ -135,17 +155,23 @@ void NTNCurses::setColor(short color, short bg_color) {
 }
 
 // Установить RGB-цвет текста и фона (если поддерживается)
-bool NTNCurses::setColorRgb(short r_text, short g_text, short b_text,
-					 short r_bg, short g_bg, short b_bg) {
+/*bool NTNCurses::setColorRgb(short r_text, short g_text, short b_text,
+					 short r_bg, short g_bg, short b_bg) {*/
+bool NTNCurses::setColorRgb(nt::Color color, nt::Color colorBg) {
 	if (!_supports_rgb) return false;
-	short color = 100;
-	short colorBg = 101;
-	enqueue([color, r_text, g_text, b_text, colorBg, r_bg, g_bg, b_bg]() {
+	//
+	short color_id = 100;
+	short colorBg_id = 101;
+	//
+	short r_text = color.r; short g_text = color.g; short b_text = color.b;
+	short r_bg = colorBg.r; short g_bg = colorBg.g; short b_bg = colorBg.b;
+	//
+	enqueue([color_id, r_text, g_text, b_text, colorBg_id, r_bg, g_bg, b_bg]() {
 		// Создаем новый цвет в палитре
-		init_color(color, r_text * 1000 / 255, g_text * 1000 / 255, b_text * 1000 / 255);
-		init_color(colorBg, r_bg * 1000 / 255, g_bg * 1000 / 255, b_bg * 1000 / 255);
+		init_color(color_id, r_text * 1000 / 255, g_text * 1000 / 255, b_text * 1000 / 255);
+		init_color(colorBg_id, r_bg * 1000 / 255, g_bg * 1000 / 255, b_bg * 1000 / 255);
 		// Связываем цветовую пару
-		init_pair(nt::CUSTOM, color, colorBg);
+		init_pair(nt::CUSTOM, color_id, colorBg_id);
 		refresh();
 	});
 	return true;
@@ -153,50 +179,34 @@ bool NTNCurses::setColorRgb(short r_text, short g_text, short b_text,
 
 //
 int NTNCurses::setAttrOn(int attrs) {
-	try {
-		enqueue([attrs]() {
-			int result = attron(attrs);
-			if (result == ERR) {
-				throw std::runtime_error("setAttrOn failed");
-			}
-			refresh();
-		});
-			return OK;
-		} catch (...) {
+	enqueue([attrs]() {
+		int result = attron(attrs);
+		if (result == ERR) {
+			// Лучше логировать ошибку здесь
+			std::cout << "attrOn failed" << std::endl;
 			return ERR;
-	}
+		}
+		return refresh();
+	});
+	return OK;
 }
 
 //
 int NTNCurses::setAttrOff(int attrs) {
-	try {
-		enqueue([attrs]() {
-			int result = attroff(attrs);
-			if (result == ERR) {
-				throw std::runtime_error("setAttrOff failed");
-			}
-			refresh();
-		});
-			return OK;
-		} catch (...) {
+	enqueue([attrs]() {
+		int result = attroff(attrs);
+		if (result == ERR) {
+			// Лучше логировать ошибку здесь
+			std::cout << "attrOff failed" << std::endl;
 			return ERR;
-	}
+		}
+		return refresh();
+	});
+	return OK;
 }
 
 // Базовая версия addch
 int NTNCurses::addCh(chtype ch) {
-	/*try {
-		enqueue([ch]() {
-			int result = addch(ch);
-			if (result == ERR) {
-				throw std::runtime_error("addCh failed");
-			}
-			refresh();
-		});
-			return OK;
-		} catch (...) {
-			return ERR;
-	}*/
 	enqueue([ch]() {
 		int result = addch(ch);
 		if (result == ERR) {
@@ -211,34 +221,30 @@ int NTNCurses::addCh(chtype ch) {
 
 // Версия addch для окон (window)
 int NTNCurses::waddCh(WINDOW* win, chtype ch) {
-	try {
-		enqueue([win, ch]() {
-			int result = waddch(win, ch);
-			if (result == ERR) {
-				throw std::runtime_error("waddch failed");
-			}
-			wrefresh(win);
-		});
-			return OK;
-		} catch (...) {
+	enqueue([win, ch]() {
+		int result = waddch(win, ch);
+		if (result == ERR) {
+			// Лучше логировать ошибку здесь
+			std::cout << "waddch failed" << std::endl;
 			return ERR;
-	}
+		}
+		return wrefresh(win);
+	});
+	return OK;
 }
 
 // Версия addch с перемещением курсора
 int NTNCurses::mvaddCh(int y, int x, chtype ch) {
-	try {
-		enqueue([y, x, ch]() {
-			int result = mvaddch(y, x, ch);
-			if (result == ERR) {
-				throw std::runtime_error("mvaddch failed");
-			}
-			refresh();
-		});
-		return OK;
-	} catch (...) {
-		return ERR;
-	}
+	enqueue([y, x, ch]() {
+		int result = mvaddch(y, x, ch);
+		if (result == ERR) {
+			// Лучше логировать ошибку здесь
+			std::cout << "mvaddch failed" << std::endl;
+			return ERR;
+		}
+		return refresh();
+	});
+	return OK;
 }
 
 // Комбинированная версия addch (окно + перемещение)
@@ -258,7 +264,7 @@ int NTNCurses::mvwaddCh(WINDOW* win, int y, int x, chtype ch) {
 }
 
 //
-void NTNCurses::print(const std::string& msg) {
+void NTNCurses::printW(const std::string& msg) {
 	enqueue([msg]() {
 		printw("%s", msg.c_str());
 		refresh();

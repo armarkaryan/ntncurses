@@ -34,8 +34,11 @@ int main() {
 	});
 
 	std::thread worker5([&]() {
+		nt::Color mainColor = {255, 255, 0};
+		nt::Color mainBg = {50, 50, 100};
 		for (int i = 0; i < 20; ++i) {
-			ntncurses.setColorRgb(255, 255, 0, 50, 50, 100);
+			//ntncurses.setColorRgb(255, 255, 0, 50, 50, 100);
+			ntncurses.setColorRgb(mainColor, mainBg);
 			ntncurses.setAttrOn(COLOR_PAIR(nt::CUSTOM));
 			//ntncurses.mvaddCh(i, i, ' ' | A_REVERSE);
 			//ntncurses.mvaddCh(i, i, ' ' | ACS_CKBOARD);
@@ -51,7 +54,7 @@ int main() {
 	worker4.join();
 	worker5.join();
 
-	ntncurses.print("     Press Space to exit...");
+	ntncurses.printW("     Press Space to exit...");
 /*
 	for (int i = 0; i < 20; ++i) {
 			ntncurses.setColorRgb(255, 255, 0, 50, 50, 100);

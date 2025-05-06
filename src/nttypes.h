@@ -7,6 +7,12 @@
 #include <string>
 
 namespace nt {
+//
+struct Color {
+	short r;
+	short g;
+	short b;
+};
 
 //
 struct Image {

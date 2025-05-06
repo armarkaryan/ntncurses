@@ -60,8 +60,9 @@ public:
 	void setColor(short color, short bgColor);
 
 	// Установить RGB-цвет текста и фона (если поддерживается)
-	bool setColorRgb(short r_text, short g_text, short b_text,
-					short r_bg, short g_bg, short b_bg);
+/*	bool setColorRgb(short r_text, short g_text, short b_text,
+					short r_bg, short g_bg, short b_bg);*/
+	bool setColorRgb(nt::Color color, nt::Color colorBg);
 
 	//
 	int setAttrOn(int attrs);
@@ -84,7 +85,7 @@ public:
 
 
 	// Работа со строками
-    void print(const std::string& msg);
+	void printW(const std::string& msg);
     
 
 	// Работа с устройствами ввода
